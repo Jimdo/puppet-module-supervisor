@@ -104,12 +104,12 @@ define supervisor::service (
   case $ensure {
     'present', 'running', 'stopped': {
       File[$log_dir] -> File[$conf_file] ~>
-        Class['supervisor::update'] -> Service["supervisor::${name}"]
+        Class['supervisor::reread'] -> Class['supervisor::update'] -> Service["supervisor::${name}"]
     }
     default: { # absent
       # First stop the service, delete the .ini, reload the config, delete the log dir
       Service["supervisor::${name}"] -> File[$conf_file] ~>
-        Class['supervisor::update'] -> File[$log_dir]
+        Class['supervisor::reread'] -> Class['supervisor::update'] -> File[$log_dir]
     }
   }
 }
